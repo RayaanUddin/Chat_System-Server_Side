@@ -37,7 +37,6 @@ class ConnectedClient extends Thread {
     }
 
     ClientList clientList;
-    int connectionId;
 
     // Test method
     public int add(int x, int y) {return x+y;}
