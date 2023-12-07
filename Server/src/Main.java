@@ -3,28 +3,23 @@ import java.io.*;
 import java.lang.*;
 
 public class Main {
-    private static ConnectedClient[] connectedClient = new ConnectedClient[4];
     public static void main(String[] args) throws IOException {
         ClientList clientList = new ClientList();
+        Client[] client = new Client[2];
         ServerSocket serverSocket = new ServerSocket(5004);
-
+        int count = 0;
         while (true) {
             Socket clientSocketCatched = null;
             System.out.println("Listening for clients...");
             try {
                 clientSocketCatched = serverSocket.accept();
-                clientList.add("Client1", clientSocketCatched);
+                ClientInfo currentClient = clientList.add("Client1", clientSocketCatched);
+                client[count] = new Client(currentClient, clientList);
+                client[count].start();
+                count++;
             } catch (Exception e) {
 
             }
-            connectedClient[0] = new ConnectedClient(clientSocketCatched, clientList, 0 );
-            connectedClient[0].start();
-        }
-    }
-
-    public static void UpdateClientList(ClientList clientList) {
-        for (int i=0; i<connectedClient.length; i++) {
-            connectedClient[i].updateConnectedClients(clientList);
         }
     }
 }
