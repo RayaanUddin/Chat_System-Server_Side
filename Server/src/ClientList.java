@@ -1,9 +1,11 @@
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.*;
 
 // class for a client
 class ClientInfo {
     private final int connectionId;
-    private Socket socket;
+    private final Socket socket;
     private String name;
 
     // Constructor
@@ -38,29 +40,39 @@ class ClientInfo {
 public class ClientList {
     private ClientInfo[] connectedClients; // Array holds all connected clients
 
-    // Adds a client to the array (Dynamically)
-    public boolean add(String name, Socket clientSocket) {
+    // Broadcast message to all
+    public void broadcastString(String message) {
+        DataOutputStream outputStream;
+        for (int i=0; i<connectedClients.length - 1; i++) {
+            try {
+                outputStream = new DataOutputStream(connectedClients[i].getSocket().getOutputStream());
+                outputStream.writeBytes(message);
+                System.out.println(message);
+            } catch(IOException e) {
+                System.out.println("Error occurred when broadcasting");
+            }
+        }
+    }
+
+    // Adds a client to the array (Dynamically), returns client added info
+    public ClientInfo add(String name, Socket clientSocket) {
         // Program starts with length 0
         // The end index is null at all times
-        try {
-            ClientInfo[] clients = new ClientInfo[connectedClients.length + 1];
-            for (int i = 0; i < connectedClients.length; i++) { // Copy current array into new created
-                clients[i] = connectedClients[i];
-            }
+        ClientInfo[] clients = new ClientInfo[connectedClients.length + 1];
+        // Copy current array into new created
+        System.arraycopy(connectedClients, 0, clients, 0, connectedClients.length);
 
-            // Next possible connection Id
-            int connectionId = 0;
-            if (connectedClients.length > 1) {
-                connectionId = connectedClients[connectedClients.length - 2].getConnectionId() + 1;
-            }
-
-            clients[connectedClients.length - 1] = new ClientInfo(clientSocket, connectionId, name);
-
-            connectedClients = clients;
-            return true;
-        } catch (Exception e) { // Error occurred
-            return false;
+        // Next possible connection Id
+        int connectionId = 0;
+        if (connectedClients.length > 1) {
+            connectionId = connectedClients[connectedClients.length - 2].getConnectionId() + 1; // the connection id must always be greater than the socket before
         }
+
+        ClientInfo currentClient = new ClientInfo(clientSocket, connectionId, name);
+        clients[connectedClients.length - 1] = currentClient;
+
+        connectedClients = clients;
+        return currentClient;
     }
 
     // Delete a client in the array (Dynamically)
@@ -74,12 +86,9 @@ public class ClientList {
             }
             ClientInfo[] clients = new ClientInfo[connectedClients.length - 1];
             // Copy current array into new created, without deleted element
-            for (int i = 0; i < index; i++) {
-                clients[i] = connectedClients[i];
-            }
-            for (int i = index + 1; i < connectedClients.length; i++) {
-                clients[i-1] = connectedClients[i];
-            }
+            System.arraycopy(connectedClients, 0, clients, 0, index);
+            if (connectedClients.length - (index + 1) >= 0)
+                System.arraycopy(connectedClients, index + 1, clients, index + 1 - 1, connectedClients.length - (index + 1));
             connectedClients = clients;
             return true;
         } catch (Exception e) { // Error occurred
@@ -115,7 +124,7 @@ public class ClientList {
         return -1; // Not found, Client has disconnected
     }
 
-    //Gets the client using its socket (inefficient: Linear Search)
+    //Gets the client using its socket (inefficient: Linear Search) DEPRECIATED
     public ClientInfo getClientBySocket(Socket clientSocket) {
         for (int i=0; i<connectedClients.length; i++) {
             if (connectedClients[i].getSocket() == clientSocket) {
@@ -127,7 +136,7 @@ public class ClientList {
 
     // Constructor
     public ClientList() {
-        connectedClients = new ClientInfo[0];
+        connectedClients = new ClientInfo[1];
     }
 }
 
