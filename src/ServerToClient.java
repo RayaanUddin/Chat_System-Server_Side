@@ -2,9 +2,9 @@
 
 import java.io.*;
 
-public class Client extends Thread {
+public class ServerToClient extends Thread {
     final boolean debug = true;
-    static class Packet {
+    static public class Packet {
         ClientInfo sender;
         String message;
     }
@@ -16,7 +16,7 @@ public class Client extends Thread {
     ClientList clientList;
 
     // Constructor
-    public Client(ClientInfo client, ClientList initialClientList) {
+    public ServerToClient(ClientInfo client, ClientList initialClientList) {
         thisClient = client;
         clientList = initialClientList;
     }
@@ -27,7 +27,7 @@ public class Client extends Thread {
     }
 
     // Receive input from client (waiting)
-    private boolean awaitingResponse(BufferedReader inputStream, DataOutputStream outputStream) {
+    private boolean awaitingResponse(BufferedReader inputStream) {
         String line;
 
         Packet packet = new Packet();
@@ -88,7 +88,7 @@ public class Client extends Thread {
         }
         String line;
         while (true) {
-            if (!awaitingResponse(inputStream, outputStream)) {
+            if (!awaitingResponse(inputStream)) {
                 return;
             }
         }
