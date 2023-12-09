@@ -1,42 +1,9 @@
+/* Class for a dynamic data structure of all clients connected to server */
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.*;
 
-// class for a client
-class ClientInfo {
-    private final int connectionId;
-    private final Socket socket;
-    private String name;
-
-    // Constructor
-    public ClientInfo(Socket clientSocket, int connId, String clientName) {
-        socket = clientSocket;
-        connectionId = connId;
-        name = clientName;
-    }
-
-    // Get Connection Id
-    public int getConnectionId() {
-        return connectionId;
-    }
-
-    // Get Client Name
-    public String getName() {
-        return name;
-    }
-
-    // Get Client Socket
-    public Socket getSocket() {
-        return socket;
-    }
-
-    // Set Client Name
-    public void setName(String clientName) {
-        name = clientName;
-    }
-}
-
-// All Clients for server (Dynamic structure)
 public class ClientList {
     private ClientInfo[] connectedClients; // Array holds all connected clients
 
@@ -57,19 +24,21 @@ public class ClientList {
     // Adds a client to the array (Dynamically), returns client added info
     public ClientInfo add(String name, Socket clientSocket) {
         // Program starts with length 0
-        // The end index is null at all times
         ClientInfo[] clients = new ClientInfo[connectedClients.length + 1];
+
         // Copy current array into new created
-        System.arraycopy(connectedClients, 0, clients, 0, connectedClients.length);
+        for (int i=0;i<connectedClients.length; i++) {
+            clients[i] = connectedClients[i];
+        }
 
         // Next possible connection Id
         int connectionId = 0;
-        if (connectedClients.length > 1) {
-            connectionId = connectedClients[connectedClients.length - 2].getConnectionId() + 1; // the connection id must always be greater than the socket before
+        if (connectedClients.length > 0) {
+            connectionId = connectedClients[connectedClients.length - 1].getConnectionId() + 1; // the connection id must always be greater than the socket before
         }
 
         ClientInfo currentClient = new ClientInfo(clientSocket, connectionId, name);
-        clients[connectedClients.length - 1] = currentClient;
+        clients[clients.length-1] = currentClient;
 
         connectedClients = clients;
         return currentClient;
@@ -78,22 +47,21 @@ public class ClientList {
     // Delete a client in the array (Dynamically)
     public boolean delete(int connectionId) {
         // Program starts with length 0
-        // The end element is null at all times
-        try {
-            int index = getConnClientLocationById(connectionId);
-            if (index < 0) {
-                return false; // Client was not found to delete
-            }
-            ClientInfo[] clients = new ClientInfo[connectedClients.length - 1];
-            // Copy current array into new created, without deleted element
-            System.arraycopy(connectedClients, 0, clients, 0, index);
-            if (connectedClients.length - (index + 1) >= 0)
-                System.arraycopy(connectedClients, index + 1, clients, index + 1 - 1, connectedClients.length - (index + 1));
-            connectedClients = clients;
-            return true;
-        } catch (Exception e) { // Error occurred
-            return false;
+        int index = getConnClientLocationById(connectionId);
+        if (index < 0) {
+            return false; // Client was not found to delete
         }
+        ClientInfo[] clients = new ClientInfo[connectedClients.length - 1];
+
+        // Copy current array into new created, without deleted element
+        for (int i=0; i<index; i++) {
+            clients[i] = connectedClients[i];
+        }
+        for (int i=index+1; i<connectedClients.length; i++) {
+            clients[i-1] = connectedClients[i];
+        }
+        connectedClients = clients;
+        return true;
     }
 
     // Gets the clients info by its connection id
@@ -136,7 +104,7 @@ public class ClientList {
 
     // Constructor
     public ClientList() {
-        connectedClients = new ClientInfo[1];
+        connectedClients = new ClientInfo[0];
     }
 }
 

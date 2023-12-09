@@ -1,11 +1,10 @@
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+/* Class inherited from thread. Every single client connected has a running thread */
+
+import java.io.*;
 
 public class Client extends Thread {
     final boolean debug = true;
-    class Packet {
+    static class Packet {
         ClientInfo sender;
         String message;
     }
