@@ -1,17 +1,18 @@
 /* Class to store a single client info */
 
+import java.io.Serializable;
 import java.net.Socket;
 
-public class ClientInfo {
+public class ClientInfo implements Serializable {
     private final int connectionId;
     private final Socket socket;
     private String name;
 
     // Constructor
-    public ClientInfo(Socket clientSocket, int connId, String clientName) {
-        socket = clientSocket;
-        connectionId = connId;
-        name = clientName;
+    public ClientInfo(Socket socket, int connectionId, String name) {
+        this.socket = socket;
+        this.connectionId = connectionId;
+        this.name = name;
     }
 
     // Get Connection Id

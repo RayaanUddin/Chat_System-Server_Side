@@ -4,10 +4,6 @@ import java.io.*;
 
 public class ServerToClient extends Thread {
     final boolean debug = true;
-    static public class Packet {
-        ClientInfo sender;
-        String message;
-    }
 
     // This clients details
     private final ClientInfo thisClient;
@@ -30,9 +26,6 @@ public class ServerToClient extends Thread {
     private boolean awaitingResponse(BufferedReader inputStream) {
         String line;
 
-        Packet packet = new Packet();
-        packet.sender = thisClient;
-
         try {
             line = inputStream.readLine();
             if (debug) {
@@ -44,20 +37,15 @@ public class ServerToClient extends Thread {
                 return false; // Client has quit
             } else {
                 if (line.substring(0,3).equalsIgnoreCase("all")) {
-                    packet.message = line.substring(3);
-                    sendMessageToAll(packet);
+                    Packet packet = new Packet(line.substring(3), thisClient);
+                    clientList.broadcastString(packet); // Send message to all clients (Broadcasting)
                 }
                 return true;
             }
         } catch (IOException e) {
             e.printStackTrace();
-            return true;
+            return false;
         }
-    }
-
-    // Send message to all clients (Broadcasting)
-    public void sendMessageToAll(Packet packet) {
-        clientList.broadcastString(packet.sender.getName() + ": \n" + packet.message + "\n");
     }
 
     // Send message to this client
@@ -65,7 +53,7 @@ public class ServerToClient extends Thread {
         try {
             DataOutputStream outputStream = new DataOutputStream(thisClient.getSocket().getOutputStream());
             // Send message
-            outputStream.writeBytes(packet.sender.getName() + " (Private): \n" + packet.message + "\n");
+            // outputStream.writeBytes(packet..getName() + " (Private): \n" + packet.message + "\n");
             outputStream.flush();
             return true;
         } catch (IOException e) {

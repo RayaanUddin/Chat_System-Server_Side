@@ -26,7 +26,11 @@ public class Main {
 
                 // Update all client lists for each client on server
                 for (int i=0; i<client.length; i++) {
-                    client[i].updateClientList(clientList);
+                    try {
+                        client[i].updateClientList(clientList);
+                    } catch (Exception e) {
+                        System.out.println("Client "+i+" needs to be deleted!!!");
+                    }
                 }
             } catch (IOException e) {
                 System.out.println("Client initial connection error");

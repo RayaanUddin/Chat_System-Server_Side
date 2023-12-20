@@ -2,19 +2,21 @@
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.*;
 
 public class ClientList {
     private ClientInfo[] connectedClients; // Array holds all connected clients
 
     // Broadcast message to all
-    public void broadcastString(String message) {
-        DataOutputStream outputStream;
-        for (int i=0; i<connectedClients.length - 1; i++) {
+    public void broadcastString(Packet packet) {
+        ObjectOutputStream outputStream;
+        for (int i=0; i<connectedClients.length; i++) {
+
             try {
-                outputStream = new DataOutputStream(connectedClients[i].getSocket().getOutputStream());
-                outputStream.writeBytes(message);
-                System.out.println(message);
+                outputStream = new ObjectOutputStream(connectedClients[i].getSocket().getOutputStream());
+                outputStream.writeObject(packet);
+                System.out.println("Broadcast: " + packet.getMessage());
             } catch(IOException e) {
                 System.out.println("Error occurred when broadcasting");
             }
