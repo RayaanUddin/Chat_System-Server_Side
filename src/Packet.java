@@ -3,7 +3,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 public class Packet implements Serializable {
-    final private ClientInfo sender;
+    final private ClientDetails senderDetails;
 
     final private String message;
 
@@ -11,11 +11,11 @@ public class Packet implements Serializable {
 
     final private LocalTime time;
 
-    public Packet(String messageInp, ClientInfo senderInp) {
-        sender = senderInp;
-        message = messageInp;
-        date = LocalDate.now();
-        time = LocalTime.now();
+    public Packet(String message, ClientDetails senderDetails) {
+        this.senderDetails = senderDetails;
+        this.message = message;
+        this.date = LocalDate.now();
+        this.time = LocalTime.now();
     }
 
     public String getMessage() {

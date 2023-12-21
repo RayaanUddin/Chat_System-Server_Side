@@ -33,11 +33,11 @@ public class ServerToClient extends Thread {
             }
             if ((line == null) || line.equalsIgnoreCase("QUIT")) {
                 thisClient.getSocket().close();
-                System.out.println("Disconnected client " + thisClient.getName());
+                System.out.println("Disconnected client " + thisClient.getClientDetails().getName());
                 return false; // Client has quit
             } else {
                 if (line.substring(0,3).equalsIgnoreCase("all")) {
-                    Packet packet = new Packet(line.substring(3), thisClient);
+                    Packet packet = new Packet(line.substring(3), thisClient.getClientDetails());
                     clientList.broadcastString(packet); // Send message to all clients (Broadcasting)
                 }
                 return true;

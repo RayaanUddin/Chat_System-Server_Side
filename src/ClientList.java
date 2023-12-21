@@ -36,7 +36,7 @@ public class ClientList {
         // Next possible connection Id
         int connectionId = 0;
         if (connectedClients.length > 0) {
-            connectionId = connectedClients[connectedClients.length - 1].getConnectionId() + 1; // the connection id must always be greater than the socket before
+            connectionId = connectedClients[connectedClients.length - 1].getClientDetails().getConnectionId() + 1; // the connection id must always be greater than the socket before
         }
 
         ClientInfo currentClient = new ClientInfo(clientSocket, connectionId, name);
@@ -82,7 +82,7 @@ public class ClientList {
         try {
             int currentIndex = connectionId;
             while (currentIndex >= 0) {
-                if (connectionId == connectedClients[currentIndex].getConnectionId()) {
+                if (connectionId == connectedClients[currentIndex].getClientDetails().getConnectionId()) {
                     return currentIndex;
                 } else {
                     currentIndex --;

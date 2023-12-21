@@ -3,35 +3,23 @@
 import java.io.Serializable;
 import java.net.Socket;
 
-public class ClientInfo implements Serializable {
-    private final int connectionId;
+public class ClientInfo {
+    private final ClientDetails clientDetails;
     private final Socket socket;
-    private String name;
 
     // Constructor
     public ClientInfo(Socket socket, int connectionId, String name) {
         this.socket = socket;
-        this.connectionId = connectionId;
-        this.name = name;
+        this.clientDetails = new ClientDetails(connectionId, name);
     }
 
-    // Get Connection Id
-    public int getConnectionId() {
-        return connectionId;
-    }
-
-    // Get Client Name
-    public String getName() {
-        return name;
+    // Get clientDetails
+    public ClientDetails getClientDetails() {
+        return this.clientDetails;
     }
 
     // Get Client Socket
     public Socket getSocket() {
         return socket;
-    }
-
-    // Set Client Name
-    public void setName(String clientName) {
-        name = clientName;
     }
 }
