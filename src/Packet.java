@@ -1,6 +1,7 @@
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 public class Packet implements Serializable {
     final private ClientDetails senderDetails;
@@ -26,7 +27,7 @@ public class Packet implements Serializable {
     }
 
     public String getDateTime() {
-        return date.toString() + " " + time.toString();
+        return date.format(DateTimeFormatter.ofPattern("dd-MM")) + " " + time.getHour() + ":" + time.getMinute();
     }
 
     public ClientDetails getClientDetails() {
