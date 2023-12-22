@@ -5,7 +5,7 @@ import java.lang.*;
 public class Main {
     public static void main(String[] args) {
         ClientList clientList = new ClientList();
-        ServerToClient[] client = new ServerToClient[2];
+        ServerToClient[] client = new ServerToClient[1000];
         int clientCount = 0;
         ServerSocket serverSocket;
         try {

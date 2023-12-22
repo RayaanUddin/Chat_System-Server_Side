@@ -39,7 +39,7 @@ public class ServerToClient extends Thread {
                 try {
                     System.out.println(line.substring(8,9));
                     if (line.substring(0, 4).equalsIgnoreCase("all ")) {
-                        Packet packet = new Packet(line.substring(3), thisClient.getClientDetails());
+                        Packet packet = new Packet(line.substring(4), thisClient.getClientDetails());
                         clientList.broadcastString(packet); // Send message to all clients (Broadcasting)
                     } else if (line.substring(0,8).equalsIgnoreCase("private ")) {
                         try {
