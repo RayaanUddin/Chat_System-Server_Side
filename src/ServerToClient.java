@@ -36,9 +36,33 @@ public class ServerToClient extends Thread {
                 System.out.println("Disconnected client " + thisClient.getClientDetails().getName());
                 return false; // Client has quit
             } else {
-                if (line.substring(0,3).equalsIgnoreCase("all")) {
-                    Packet packet = new Packet(line.substring(3), thisClient.getClientDetails());
-                    clientList.broadcastString(packet); // Send message to all clients (Broadcasting)
+                try {
+                    System.out.println(line.substring(8,9));
+                    if (line.substring(0, 4).equalsIgnoreCase("all ")) {
+                        Packet packet = new Packet(line.substring(3), thisClient.getClientDetails());
+                        clientList.broadcastString(packet); // Send message to all clients (Broadcasting)
+                    } else if (line.substring(0,8).equalsIgnoreCase("private ")) {
+                        try {
+                            int connId;
+                            String connId_str = "";
+                            String message = "";
+                            for (int i=8;i<line.length();i++) {
+                                if ((line.substring(i, i + 1).equals(" "))) {
+                                    message = line.substring(i + 1);
+                                    break;
+                                } else {
+                                    connId_str = connId_str + line.charAt(i);
+                                }
+                            }
+                            if (!message.isEmpty()) {
+                                connId = Integer.parseInt(connId_str);
+                                clientList.sendMessageToClient(message, connId);
+                            }
+                        } catch (Exception ignored) {}
+
+                    }
+                } catch (Exception e) {
+
                 }
                 return true;
             }
@@ -53,8 +77,7 @@ public class ServerToClient extends Thread {
         try {
             DataOutputStream outputStream = new DataOutputStream(thisClient.getSocket().getOutputStream());
             // Send message
-            // outputStream.writeBytes(packet..getName() + " (Private): \n" + packet.message + "\n");
-            outputStream.flush();
+            //outputStream.writeBytes();
             return true;
         } catch (IOException e) {
             if (debug) {

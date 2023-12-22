@@ -23,6 +23,20 @@ public class ClientList {
         }
     }
 
+    // Send message to a client
+    public boolean sendMessageToClient(String message, int clientConnId) {
+        try {
+            ClientInfo client = getClientById(clientConnId);
+            ObjectOutputStream outputStream = new ObjectOutputStream(client.getSocket().getOutputStream());
+            Packet packet = new Packet(message, client.getClientDetails());
+            outputStream.writeObject(packet);
+            return true;
+        } catch (IOException e) {
+            System.out.println("Client not found");
+            return false;
+        }
+    }
+
     // Adds a client to the array (Dynamically), returns client added info
     public ClientInfo add(String name, Socket clientSocket) {
         // Program starts with length 0

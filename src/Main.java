@@ -29,7 +29,7 @@ public class Main {
                     try {
                         client[i].updateClientList(clientList);
                     } catch (Exception e) {
-                        System.out.println("Client "+i+" needs to be deleted!!!");
+                        System.out.println("Client " + i + " needs to be deleted!!!");
                     }
                 }
             } catch (IOException e) {
