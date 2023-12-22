@@ -37,7 +37,6 @@ public class ServerToClient extends Thread {
                 return false; // Client has quit
             } else {
                 try {
-                    System.out.println(line.substring(8,9));
                     if (line.substring(0, 4).equalsIgnoreCase("all ")) {
                         Packet packet = new Packet(line.substring(4), thisClient.getClientDetails());
                         clientList.broadcastString(packet); // Send message to all clients (Broadcasting)
@@ -56,7 +55,7 @@ public class ServerToClient extends Thread {
                             }
                             if (!message.isEmpty()) {
                                 connId = Integer.parseInt(connId_str);
-                                clientList.sendMessageToClient(message, connId);
+                                clientList.sendMessageToClient(message, connId, thisClient.getClientDetails());
                             }
                         } catch (Exception ignored) {}
 

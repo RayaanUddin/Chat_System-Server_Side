@@ -24,11 +24,11 @@ public class ClientList {
     }
 
     // Send message to a client
-    public boolean sendMessageToClient(String message, int clientConnId) {
+    public boolean sendMessageToClient(String message, int clientConnId, ClientDetails senderDetails) {
         try {
             ClientInfo client = getClientById(clientConnId);
             ObjectOutputStream outputStream = new ObjectOutputStream(client.getSocket().getOutputStream());
-            Packet packet = new Packet(message, client.getClientDetails());
+            Packet packet = new Packet(message, senderDetails);
             outputStream.writeObject(packet);
             return true;
         } catch (IOException e) {

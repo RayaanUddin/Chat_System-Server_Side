@@ -5,7 +5,9 @@ import java.time.LocalTime;
 public class Packet implements Serializable {
     final private ClientDetails senderDetails;
 
-    final private String message;
+    private String type; // message or command, message on default
+
+    final private String message; // used to hold message or command string
 
     final private LocalDate date;
 
@@ -16,6 +18,7 @@ public class Packet implements Serializable {
         this.message = message;
         this.date = LocalDate.now();
         this.time = LocalTime.now();
+        type = "message";
     }
 
     public String getMessage() {
@@ -24,5 +27,13 @@ public class Packet implements Serializable {
 
     public String getDateTime() {
         return date.toString() + " " + time.toString();
+    }
+
+    public ClientDetails getClientDetails() {
+        return senderDetails;
+    }
+
+    public boolean isMessage() {
+        return type.equalsIgnoreCase("message");
     }
 }
