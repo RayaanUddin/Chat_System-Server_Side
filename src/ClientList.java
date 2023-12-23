@@ -11,12 +11,13 @@ public class ClientList {
     // Broadcast message to all
     public void broadcastString(Packet packet) {
         ObjectOutputStream outputStream;
+        System.out.println("Broadcast: " + packet.getMessage());
         for (int i=0; i<connectedClients.length; i++) {
-
             try {
-                outputStream = new ObjectOutputStream(connectedClients[i].getSocket().getOutputStream());
-                outputStream.writeObject(packet);
-                System.out.println("Broadcast: " + packet.getMessage());
+                if (connectedClients[i].getClientDetails().getConnectionId() != packet.getClientDetails().getConnectionId()) {
+                    outputStream = new ObjectOutputStream(connectedClients[i].getSocket().getOutputStream());
+                    outputStream.writeObject(packet);
+                }
             } catch(IOException e) {
                 System.out.println("Error occurred when broadcasting");
             }
