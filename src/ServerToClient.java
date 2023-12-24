@@ -74,7 +74,7 @@ public class ServerToClient extends Thread {
 
     // Running program
     public void run() {
-        BufferedReader inputStream = null;
+        BufferedReader inputStream;
         try {
             inputStream = new BufferedReader(new InputStreamReader(thisClient.getSocket().getInputStream()));
         } catch (IOException e) {
