@@ -1,6 +1,5 @@
 /* Class to store a single client info */
 
-import java.io.Serializable;
 import java.net.Socket;
 
 public class ClientInfo {

@@ -14,27 +14,31 @@ public class Main {
             System.out.println("Failed to create server socket");
             return;
         }
-        while (true) {
-            Socket clientSocketCatched = null;
-            System.out.println("Listening for clients...");
-            try {
-                clientSocketCatched = serverSocket.accept();
-                ClientInfo currentClient = clientList.add("Client1", clientSocketCatched);
-                client[clientCount] = new ServerToClient(currentClient, clientList);
-                client[clientCount].start();
-                clientCount++;
+        try {
+            while (true) {
+                Socket clientSocketCaught;
+                System.out.println("Listening for clients...");
+                try {
+                    clientSocketCaught = serverSocket.accept();
+                    ClientInfo currentClient = clientList.add("Client1", clientSocketCaught);
+                    client[clientCount] = new ServerToClient(currentClient, clientList);
+                    client[clientCount].start();
+                    clientCount++;
 
-                // Update all client lists for each client on server
-                for (int i=0; i<client.length; i++) {
-                    try {
-                        client[i].updateClientList(clientList);
-                    } catch (Exception e) {
-                        System.out.println("Client " + i + " needs to be deleted!!!");
+                    // Update all client lists for each client on server
+                    for (int i = 0; i < client.length; i++) {
+                        try {
+                            client[i].updateClientList(clientList);
+                        } catch (Exception e) {
+                            System.out.println("Client " + i + " needs to be deleted!!!");
+                        }
                     }
+                } catch (IOException e) {
+                    System.out.println("Client initial connection error");
                 }
-            } catch (IOException e) {
-                System.out.println("Client initial connection error");
             }
+        } catch (Exception e) {
+            System.out.println("Server loop has been interrupted!\nEnding program...");
         }
     }
 }

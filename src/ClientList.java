@@ -1,6 +1,5 @@
 /* Class for a dynamic data structure of all clients connected to server */
 
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.*;
@@ -12,13 +11,13 @@ public class ClientList {
     public void broadcastString(Packet packet) {
         ObjectOutputStream outputStream;
         System.out.println("Broadcast: " + packet.getMessage());
-        for (int i=0; i<connectedClients.length; i++) {
+        for (ClientInfo connectedClient : connectedClients) {
             try {
-                if (connectedClients[i].getClientDetails().getConnectionId() != packet.getClientDetails().getConnectionId()) {
-                    outputStream = new ObjectOutputStream(connectedClients[i].getSocket().getOutputStream());
+                if (connectedClient.getClientDetails().getConnectionId() != packet.getClientDetails().getConnectionId()) {
+                    outputStream = new ObjectOutputStream(connectedClient.getSocket().getOutputStream());
                     outputStream.writeObject(packet);
                 }
-            } catch(IOException e) {
+            } catch (IOException e) {
                 System.out.println("Error occurred when broadcasting");
             }
         }
@@ -31,6 +30,7 @@ public class ClientList {
             ObjectOutputStream outputStream = new ObjectOutputStream(client.getSocket().getOutputStream());
             Packet packet = new Packet(message, senderDetails);
             outputStream.writeObject(packet);
+            System.out.println("Private message sent");
             return true;
         } catch (IOException e) {
             System.out.println("Client not found");
@@ -107,16 +107,6 @@ public class ClientList {
             return -1; // Not found, Array out of bound
         }
         return -1; // Not found, Client has disconnected
-    }
-
-    //Gets the client using its socket (inefficient: Linear Search) DEPRECIATED
-    public ClientInfo getClientBySocket(Socket clientSocket) {
-        for (int i=0; i<connectedClients.length; i++) {
-            if (connectedClients[i].getSocket() == clientSocket) {
-                return connectedClients[i];
-            }
-        }
-        return null; // Not found
     }
 
     // Constructor

@@ -1,3 +1,5 @@
+/*Holds data being transmitted to clients from server. Can either contain a message or a command*/
+
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalTime;

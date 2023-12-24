@@ -46,7 +46,7 @@ public class ServerToClient extends Thread {
                             String connId_str = "";
                             String message = "";
                             for (int i=8;i<line.length();i++) {
-                                if ((line.substring(i, i + 1).equals(" "))) {
+                                if ((line.charAt(i) == ' ')) {
                                     message = line.substring(i + 1);
                                     break;
                                 } else {
@@ -55,13 +55,14 @@ public class ServerToClient extends Thread {
                             }
                             if (!message.isEmpty()) {
                                 connId = Integer.parseInt(connId_str);
-                                clientList.sendMessageToClient(message, connId, thisClient.getClientDetails());
+                                if (clientList.sendMessageToClient(message, connId, thisClient.getClientDetails())) {
+                                    System.out.println("Sending private message..");
+                                }
                             }
                         } catch (Exception ignored) {}
 
                     }
-                } catch (Exception e) {
-
+                } catch (Exception ignored) {
                 }
                 return true;
             }
@@ -71,32 +72,14 @@ public class ServerToClient extends Thread {
         }
     }
 
-    // Send message to this client
-    public boolean sendMessageToThisClient(Packet packet) {
-        try {
-            DataOutputStream outputStream = new DataOutputStream(thisClient.getSocket().getOutputStream());
-            // Send message
-            //outputStream.writeBytes();
-            return true;
-        } catch (IOException e) {
-            if (debug) {
-                System.out.println("Connection Lost");
-            }
-            return false;
-        }
-    }
-
     // Running program
     public void run() {
         BufferedReader inputStream = null;
-        DataOutputStream outputStream = null;
         try {
             inputStream = new BufferedReader(new InputStreamReader(thisClient.getSocket().getInputStream()));
-            outputStream = new DataOutputStream(thisClient.getSocket().getOutputStream());
         } catch (IOException e) {
             return; // Connection lost from client
         }
-        String line;
         while (true) {
             if (!awaitingResponse(inputStream)) {
                 return;
