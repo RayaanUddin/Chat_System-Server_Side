@@ -5,16 +5,22 @@ import java.io.ObjectOutputStream;
 import java.net.*;
 
 public class ClientList {
-    private ClientInfo[] connectedClients; // Array holds all connected clients
+
+    private static class Client {
+        public ClientInfo clientInfo; // Array holds all connected clients
+        public ServerToClient clientThread; // Running communications between server to individual client
+    }
+
+    private Client[] client; // Holds thread + client info to generate a list
 
     // Broadcast message to all
     public void broadcastString(Packet packet) {
         ObjectOutputStream outputStream;
         System.out.println("Broadcast: " + packet.getMessage());
-        for (ClientInfo connectedClient : connectedClients) {
+        for (int i=0; i<client.length; i++) {
             try {
-                if (connectedClient.getClientDetails().getConnectionId() != packet.getClientDetails().getConnectionId()) {
-                    outputStream = new ObjectOutputStream(connectedClient.getSocket().getOutputStream());
+                if (client[i].clientInfo.getClientDetails().getConnectionId() != packet.getClientDetails().getConnectionId()) {
+                    outputStream = new ObjectOutputStream(client[i].clientInfo.getSocket().getOutputStream());
                     outputStream.writeObject(packet);
                 }
             } catch (IOException e) {
@@ -27,6 +33,10 @@ public class ClientList {
     public boolean sendMessageToClient(String message, int clientConnId, ClientDetails senderDetails) {
         try {
             ClientInfo client = getClientById(clientConnId);
+            if (client == null) {
+                System.out.println("Client not found");
+                return false;
+            }
             ObjectOutputStream outputStream = new ObjectOutputStream(client.getSocket().getOutputStream());
             Packet packet = new Packet(message, senderDetails);
             outputStream.writeObject(packet);
@@ -39,54 +49,67 @@ public class ClientList {
     }
 
     // Adds a client to the array (Dynamically), returns client added info
-    public ClientInfo add(String name, Socket clientSocket) {
-        // Program starts with length 0
-        ClientInfo[] clients = new ClientInfo[connectedClients.length + 1];
+    public void add(String name, Socket clientSocket) {
+        try {
+            Client[] client_new = new Client[client.length + 1];
 
-        // Copy current array into new created
-        for (int i=0;i<connectedClients.length; i++) {
-            clients[i] = connectedClients[i];
+            // Copy current array into new created
+            for (int i=0;i<client.length; i++) {
+                client_new[i] = client[i];
+            }
+
+            // Next possible connection Id
+            int connectionId = 0;
+            if (client.length > 0) {
+                connectionId = client[client.length - 1].clientInfo.getClientDetails().getConnectionId() + 1; // the connection id must always be greater than the socket before
+            }
+
+            client_new[client_new.length-1] = new Client();
+
+            // Setting client info
+            ClientInfo currentClientInfo = new ClientInfo(clientSocket, connectionId, name);
+            client_new[client_new.length-1].clientInfo = currentClientInfo;
+
+            // Setting thread
+            ServerToClient currentClient = new ServerToClient(currentClientInfo, this);
+            currentClient.start();
+            client_new[client_new.length-1].clientThread = currentClient;
+
+            client = client_new;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        // Next possible connection Id
-        int connectionId = 0;
-        if (connectedClients.length > 0) {
-            connectionId = connectedClients[connectedClients.length - 1].getClientDetails().getConnectionId() + 1; // the connection id must always be greater than the socket before
-        }
-
-        ClientInfo currentClient = new ClientInfo(clientSocket, connectionId, name);
-        clients[clients.length-1] = currentClient;
-
-        connectedClients = clients;
-        return currentClient;
+        return;
     }
 
     // Delete a client in the array (Dynamically)
     public boolean delete(int connectionId) {
-        // Program starts with length 0
+        // Clients Connected List: Starts from 0
         int index = getConnClientLocationById(connectionId);
         if (index < 0) {
             return false; // Client was not found to delete
         }
-        ClientInfo[] clients = new ClientInfo[connectedClients.length - 1];
+        Client[] client_new = new Client[client.length - 1];
 
         // Copy current array into new created, without deleted element
         for (int i=0; i<index; i++) {
-            clients[i] = connectedClients[i];
+            client_new[i] = client[i];
         }
-        for (int i=index+1; i<connectedClients.length; i++) {
-            clients[i-1] = connectedClients[i];
+        for (int i=index+1; i<client.length; i++) {
+            client_new[i-1] = client[i];
         }
-        connectedClients = clients;
+
+        client = client_new;
         return true;
     }
 
     // Gets the clients info by its connection id
     public ClientInfo getClientById(int connectionId) {
-        try {
-            return connectedClients[getConnClientLocationById(connectionId)];
-        } catch (Exception e) { // getConnClientLocationById returned -1, Client not found
-            return null; // Not found
+        int index = getConnClientLocationById(connectionId);
+        if (index < 0) {
+            return null;
+        } else {
+            return client[getConnClientLocationById(connectionId)].clientInfo;
         }
     }
 
@@ -97,7 +120,7 @@ public class ClientList {
         try {
             int currentIndex = connectionId;
             while (currentIndex >= 0) {
-                if (connectionId == connectedClients[currentIndex].getClientDetails().getConnectionId()) {
+                if (connectionId == client[currentIndex].clientInfo.getClientDetails().getConnectionId()) {
                     return currentIndex;
                 } else {
                     currentIndex --;
@@ -111,7 +134,7 @@ public class ClientList {
 
     // Constructor
     public ClientList() {
-        connectedClients = new ClientInfo[0];
+        client = new Client[0];
     }
 }
 

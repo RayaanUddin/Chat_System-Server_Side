@@ -5,8 +5,6 @@ import java.lang.*;
 public class Main {
     public static void main(String[] args) {
         ClientList clientList = new ClientList();
-        ServerToClient[] client = new ServerToClient[1000];
-        int clientCount = 0;
         ServerSocket serverSocket;
         try {
             serverSocket = new ServerSocket(5004);
@@ -20,19 +18,7 @@ public class Main {
                 System.out.println("Listening for clients...");
                 try {
                     clientSocketCaught = serverSocket.accept();
-                    ClientInfo currentClient = clientList.add("Client1", clientSocketCaught);
-                    client[clientCount] = new ServerToClient(currentClient, clientList);
-                    client[clientCount].start();
-                    clientCount++;
-
-                    // Update all client lists for each client on server
-                    for (int i = 0; i < client.length; i++) {
-                        try {
-                            client[i].updateClientList(clientList);
-                        } catch (Exception e) {
-                            System.out.println("Client " + i + " needs to be deleted!!!");
-                        }
-                    }
+                    clientList.add("Client1", clientSocketCaught);
                 } catch (IOException e) {
                     System.out.println("Client initial connection error");
                 }
