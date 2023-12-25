@@ -48,9 +48,21 @@ public class ClientList {
         }
     }
 
+    //Clears all clients disconnected
+    public void clearDisconnectedClients() {
+        for (int i=0; i<client.length; i++) {
+            if (!client[i].clientThread.isAlive()) {
+                int connId = client[i].clientInfo.getClientDetails().getConnectionId();
+                System.out.println("Deleting " + connId);
+                delete(connId);
+            }
+        }
+    }
+
     // Adds a client to the array (Dynamically), returns client added info
     public void add(String name, Socket clientSocket) {
         try {
+            clearDisconnectedClients();
             Client[] client_new = new Client[client.length + 1];
 
             // Copy current array into new created
@@ -63,7 +75,6 @@ public class ClientList {
             if (client.length > 0) {
                 connectionId = client[client.length - 1].clientInfo.getClientDetails().getConnectionId() + 1; // the connection id must always be greater than the socket before
             }
-
             client_new[client_new.length-1] = new Client();
 
             // Setting client info
@@ -76,6 +87,7 @@ public class ClientList {
             client_new[client_new.length-1].clientThread = currentClient;
 
             client = client_new;
+            clearDisconnectedClients();
         } catch (Exception e) {
             e.printStackTrace();
         }

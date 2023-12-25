@@ -8,7 +8,7 @@ public class ServerToClient extends Thread {
     // This clients details
     private final ClientInfo thisClient;
 
-    // All clients connected (Needs Updating every time a client connects)
+    // All clients connected (Needs Updating every time a client connects): Read only
     ClientList clientList;
 
     // Constructor
@@ -82,6 +82,7 @@ public class ServerToClient extends Thread {
         }
         while (true) {
             if (!awaitingResponse(inputStream)) {
+                // Delete client
                 return;
             }
         }
